@@ -1,12 +1,16 @@
 package com.sametcetinkaya.foodbookapp.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.sametcetinkaya.foodbookapp.R
 import com.sametcetinkaya.foodbookapp.model.Food
+import com.sametcetinkaya.foodbookapp.util.gorselIndir
+import com.sametcetinkaya.foodbookapp.util.placeholderYap
 import com.sametcetinkaya.foodbookapp.view.FoodListFragmentDirections
 import kotlinx.android.synthetic.main.food_recycler_row.view.*
 
@@ -23,9 +27,13 @@ class FoodRecyclerAdapter(val foodList : ArrayList<Food>) : RecyclerView.Adapter
     }
 
     override fun onBindViewHolder(holder: FoodViewHolder, position: Int) {
-        holder.itemView.name.text = foodList.get(position).foodName
-        holder.itemView.cal.text = foodList.get(position).foodCal
-        //görsel kısmı eklenecek
+        holder.itemView.apply {
+            imageView.gorselIndir(foodList.get(position).foodImage, placeholderYap(holder.itemView.context))
+            name.text = foodList.get(position).foodName
+            cal.text = foodList.get(position).foodCal
+
+        }
+
 
         holder.itemView.setOnClickListener {
             val action = FoodListFragmentDirections.actionFoodListFragmentToFoodDetailFragment(0)

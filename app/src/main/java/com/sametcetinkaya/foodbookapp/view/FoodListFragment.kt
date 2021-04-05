@@ -40,7 +40,13 @@ class FoodListFragment : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = recyclerFoodAdapter
-
+        swipeRefreshLayout.setOnRefreshListener {
+            besinYukleniyor.visibility = View.VISIBLE
+            besinHataMesaji.visibility = View.GONE
+            recyclerView.visibility = View.GONE
+            viewModel.refreshData()
+            swipeRefreshLayout.isRefreshing = false
+        }
         observeLiveData()
     }
 

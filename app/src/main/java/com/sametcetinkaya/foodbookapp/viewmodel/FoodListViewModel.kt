@@ -3,21 +3,49 @@ package com.sametcetinkaya.foodbookapp.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.sametcetinkaya.foodbookapp.model.Food
+import com.sametcetinkaya.foodbookapp.servis.FoodAPIService
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
 
 class FoodListViewModel : ViewModel() {
     val foods = MutableLiveData<List<Food>>()
     val foodErrorMessage = MutableLiveData<Boolean>()
     val foodDownload = MutableLiveData<Boolean>()
 
+    private val foodApiService = FoodAPIService()
+    private val disposable = CompositeDisposable()
+
     fun refreshData() {
-        val muz = Food("Muz","100","10","1","10","www.test.com")
-        val cilek = Food("Cilek","200","20","10","10","www.test.com")
-        val elma = Food("Elma","300","30","3","10","www.test.com")
-
-        val foodList = arrayListOf<Food>(muz,cilek,elma)
-
-        foods.value = foodList
-        foodErrorMessage.value = false
-        foodDownload.value = false
+        verileriInternettenAl()
     }
+
+    private fun verileriInternettenAl(){
+        foodDownload.value = true
+
+        //IO, Default, UI
+        disposable.add(
+                foodApiService.getData()
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(object  : DisposableSingleObserver<List<Food>>(){
+                            override fun onSuccess(t: List<Food>) {
+                                //Başarılı olursa
+                                foods.value = t
+                                foodErrorMessage.value = false
+                                foodDownload.value = false
+                            }
+
+                            override fun onError(e: Throwable) {
+                                //Hata alırsak
+                                foodErrorMessage.value = false
+                                foodDownload.value = false
+                                e.printStackTrace()
+                            }
+
+                        })
+        )
+    }
+
 }
